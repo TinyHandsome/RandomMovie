@@ -20,5 +20,11 @@ class Actor:
     name: str
     movies: [Movie]
 
+    def get_actor_name(self):
+        return self.name
+
+    def set_movies(self, movie):
+        self.movies.append(movie)
+
     def get_json(self):
         return {self.name: [m.get_json() for m in self.movies]}

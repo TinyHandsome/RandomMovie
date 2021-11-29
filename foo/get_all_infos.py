@@ -13,6 +13,7 @@
 import re
 
 from configs.config import BASE_PATH
+from foo.actor import Actor
 from foo.file_folder_deal import *
 from foo.json_dict_pickle_transfer import *
 from foo.movie import Movie
@@ -85,16 +86,26 @@ def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: st
     return movie
 
 
+def update_actor_info(actor_infos: dict, actor_name, movie_data):
+    """处理值是list的字典"""
+    current_actor_names = [a.get_actor_name() for a in actor_infos]
+
+    if actor_name not in current_actor_names:
+        actor_infos[actor_name] = (Actor(actor_name, [movie_data]))
+    else:
+        actor_infos[actor_name].set_movies(movie_data)
+
+
 def get_actor_movies(actor_infos: dict, movie_data: Movie, folder_actors: list, folder_name_actor: str):
     """根据演员文件夹的名称，获得对应的电影信息"""
     # 直接演员名写入
     if folder_name_actor != '':
-        update_dict_info(actor_infos, folder_name_actor, movie_data)
+        update_actor_info(actor_infos, folder_name_actor, movie_data)
     else:
         # 不是的话，就要遍历寻找这个演员字符串中有没有演员列表中的演员，重复的也要包括
         for actor_name in folder_actors:
             if actor_name in movie_data.get_actor_name():
-                update_dict_info(actor_infos, actor_name, movie_data)
+                update_actor_info(actor_infos, actor_name, movie_data)
 
 
 def get_all_infos():
@@ -147,8 +158,8 @@ def get_all_infos():
     save_movie_to_json(data, 'm')
     save_data_to_pickle(data, 'm')
     # 保存演员数据到json pickle
-    save_movie_to_json(data, 'a')
-    save_data_to_pickle(data, 'a')
+    save_movie_to_json(actor_infos, 'a')
+    save_data_to_pickle(actor_infos, 'a')
 
 
 if __name__ == '__main__':
