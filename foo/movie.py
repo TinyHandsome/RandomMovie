@@ -6,16 +6,16 @@
 @author: Liyingjun
 @contact: 694317828@qq.com
 @software: pycharm
-@file: actor.py
+@file: movie.py
 @time: 2021/11/29 15:36
-@desc: Actor类
+@desc: Movie类
 """
 
 from dataclasses import dataclass
 
 
 @dataclass
-class Actor:
+class Movie:
     plate_number: str
     episode: str
     c: str

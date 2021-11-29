@@ -14,8 +14,8 @@ import re
 
 from configs.config import BASE_PATH
 from foo.file_folder_deal import *
-from foo.json_dict_transfer import save_dict_to_json
-from foo.actor import Actor
+from foo.json_dict_pickle_transfer import *
+from foo.movie import Movie
 
 
 def deal_long_name(long_name):
@@ -75,11 +75,11 @@ def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: st
         'c': '中文字幕' if c else '',
         'u': '无码' if result_dict.get('u') is not None else '有码',
         'topic': get_value_if_not_none_else_empty('topic'),
-        'name': name.strip(),
+        'name': name,
         'path': path
     }
 
-    movie = Actor(**movie)
+    movie = Movie(**movie)
 
     return movie
 
@@ -121,10 +121,11 @@ def get_all_infos():
 
                     # 开始写入数据
                     movie_data = generate_single_movie_info_dict(result_dict, third_path, actor_name)
-                    data.append(movie_data.__dict__)
+                    data.append(movie_data)
 
     # 保存数据到JSON
-    save_dict_to_json(data)
+    save_movie_to_json(data)
+    save_movie_to_pickle(data)
     # 加工数据获得演员 对应的 所有数据，这里的演员只包含，文件夹的演员
     # actor_infos = get_actor_movies(data)
 
