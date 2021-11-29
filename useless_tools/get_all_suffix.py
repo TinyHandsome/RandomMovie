@@ -26,3 +26,7 @@ def get_all_suffix():
                     suffixs.append(suffix)
 
     print(suffixs)
+
+
+if __name__ == '__main__':
+    get_all_suffix()
