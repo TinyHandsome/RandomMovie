@@ -14,7 +14,7 @@ import os
 base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 # 视频根目录
-BASE_PATH = ['G:/编程脚本']
+BASE_PATH = ['G:/编程脚本/Movies']
 # 视频格式限制
 AIM_SUFFIX = ['.mkv', '.wmv', '.mp4', '.avi']
 
