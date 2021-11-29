@@ -1,5 +1,16 @@
 #!/usr/bin/env python
-# coding: utf-8
+# -*- coding: UTF-8 -*-
+# coding=utf-8
+
+"""
+@author: Liyingjun
+@contact: 694317828@qq.com
+@software: pycharm
+@file: random_file.py
+@time: 2021/11/29 9:37
+@desc:
+"""
+
 import os
 import re
 from random import sample
@@ -8,19 +19,20 @@ import tkinter as tk
 import threading
 from system_hotkey import SystemHotkey
 
+from configs.config import *
+
 
 def get_file():
-    bases = ['G:/编程脚本']
-    aim_houzhui = ['.mkv', '.wmv', '.mp4', '.avi']
-    houzhuis = []
+    """获取所有对应后缀的文件，并随机"""
+    suffixs = []
     files = []
-    for base in bases:
+    for base in BASE_PATH:
         for root, _, fs in os.walk(base):
             for file in fs:
-                houzhui = os.path.splitext(file)[1]
-                houzhuis.append(houzhui)
+                suffix = os.path.splitext(file)[1]
+                suffixs.append(suffix)
 
-                if houzhui in aim_houzhui:
+                if suffix in AIM_SUFFIX:
                     files.append(root + '/' + file)
 
     return sample(files, 1)[0].replace("\\", "/")
@@ -40,12 +52,12 @@ def get_word():
 class ShowMachine:
     def __init__(self):
         self.aim_path = None
-        self.ico_path = 'D:/【Codes】各种代码啊/FxxkOnmyoji/configures/自由之翼.ico'
+        self.ICO_PATH = ICO_PATH
         self.last_one = []
         self.sh = SystemHotkey()
 
         try:
-            with open('password', 'rb') as f:
+            with open(PASSWORD_SAVE_PATH, 'rb') as f:
                 self.password = str(f.read(), encoding='utf-8')
         except Exception as e:
             self.password = ''
@@ -65,7 +77,7 @@ class ShowMachine:
         root = tk.Tk()
         root.title('自由之翼')
         root.resizable(0, 0)
-        root.iconbitmap(self.ico_path)
+        root.iconbitmap(self.ICO_PATH)
         root.geometry('+900+300')
 
         def confirm_code():
@@ -89,7 +101,7 @@ class ShowMachine:
     def show(self):
         root = tk.Tk()
         root.title('自由之翼')
-        root.iconbitmap(self.ico_path)
+        root.iconbitmap(self.ICO_PATH)
         root.resizable(0, 0)
         root.geometry('+900+300')
 
@@ -161,11 +173,11 @@ class ShowMachine:
             """重新设置密令"""
             top = tk.Toplevel()
             top.geometry('+900+300')
-            top.iconbitmap(self.ico_path)
+            top.iconbitmap(self.ICO_PATH)
             top.title('重制密令')
 
             def save_file():
-                with open('password', 'wb') as g:
+                with open(PASSWORD_SAVE_PATH, 'wb') as g:
                     self.password = new_password.get()
                     g.write(bytes(self.password, encoding='utf-8'))
                 media_code.set('密令已重置')
