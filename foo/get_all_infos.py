@@ -40,7 +40,7 @@ def deal_long_name(long_name):
     return params
 
 
-def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: str):
+def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: str) -> Movie:
     """将电影的信息转换为字典返回"""
 
     c = False
@@ -85,50 +85,70 @@ def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: st
     return movie
 
 
-def get_actor_movies(data):
+def get_actor_movies(actor_infos: list, movie_data: Movie, folder_actors: list, folder_name_actor: str):
     """根据演员文件夹的名称，获得对应的电影信息"""
-    ...
+    # 直接演员名写入
+    if folder_name_actor != '':
+        update_dict_info(actor_infos, folder_name_actor, movie_data)
+    else:
+        # 不是的话，就要遍历寻找这个演员字符串中有没有演员列表中的演员，重复的也要包括
+        for actor_name in folder_actors:
+            if actor_name in movie_data.get_actor_name():
+                update_dict_info(actor_infos, actor_name, movie_data)
 
 
 def get_all_infos():
     """获取所有文件的信息"""
+    # 总电影数据
     data = []
+    # 文件夹演员名称列表
     folder_actors = []
+    # 总文件夹演员数据
+    actor_infos = []
 
     for path in BASE_PATH:
         seconds = os.listdir(path)
 
-        for actor_name in seconds:
-            second_path = os.path.join(path, actor_name)
-            # _开头的文件夹，无演员名
+        # 获取演员名命名的文件夹
+        actor_names = [s for s in seconds if not s.startswith('_')]
+        # 并入到总演员名中，并去重
+        folder_actors.extend(actor_names)
+        folder_actors = list(set(folder_actors))
+
+        for folder_name_actor in seconds:
+            second_path = os.path.join(path, folder_name_actor)
+            # 只要文件夹
             if is_dir(second_path):
-                if actor_name.startswith('_'):
-                    actor_name = ''
-                else:
-                    folder_actors.append(actor_name)
+                # _开头的文件夹，无演员名
+                if folder_name_actor.startswith('_'):
+                    folder_name_actor = ''
 
-            # 遍历三级目录
-            thirds = os.listdir(second_path)
-            for movie in thirds:
-                third_path = os.path.join(second_path, movie)
-                # 如果是文件，且后缀满足要求
-                if is_file(third_path) and is_aim_suffix(movie):
-                    long_name = get_remove_suffix(movie)
-                    result_dict = deal_long_name(long_name)
+                # 遍历三级目录
+                thirds = os.listdir(second_path)
+                for movie in thirds:
+                    third_path = os.path.join(second_path, movie)
+                    # 如果是文件，且后缀满足要求
+                    if is_file(third_path) and is_aim_suffix(movie):
+                        long_name = get_remove_suffix(movie)
+                        result_dict = deal_long_name(long_name)
 
-                    # 如果没有成功匹配，就直接给个topic完事儿
-                    if not result_dict:
-                        result_dict = {'topic': long_name}
+                        # 如果没有成功匹配，就直接给个topic完事儿
+                        if not result_dict:
+                            result_dict = {'topic': long_name}
 
-                    # 开始写入数据
-                    movie_data = generate_single_movie_info_dict(result_dict, third_path, actor_name)
-                    data.append(movie_data)
+                        # 开始写入数据
+                        movie_data = generate_single_movie_info_dict(result_dict, third_path, folder_name_actor)
+                        # 加入到总movie中来
+                        data.append(movie_data)
+                        # 加工数据获得演员 对应的 所有数据，这里的演员名称只包含，文件夹的演员
+                        get_actor_movies(actor_infos, movie_data, folder_actors, folder_name_actor)
 
-    # 保存数据到JSON
-    save_movie_to_json(data)
-    save_movie_to_pickle(data)
-    # 加工数据获得演员 对应的 所有数据，这里的演员只包含，文件夹的演员
-    # actor_infos = get_actor_movies(data)
+    # 保存电影数据到json pickle
+    save_movie_to_json(data, 'm')
+    save_data_to_pickle(data, 'm')
+    # 保存演员数据到json pickle
+    save_movie_to_json(data, 'a')
+    save_data_to_pickle(data, 'a')
 
 
 if __name__ == '__main__':

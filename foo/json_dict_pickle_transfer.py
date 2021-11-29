@@ -13,21 +13,44 @@
 import json
 import pickle
 
-from configs.config import JSON_SAVE_PATH, MOVIES_SAVE_PATH
+from configs.config import MOVIE_JSON_SAVE_PATH, MOVIE_PICKLE_SAVE_PATH, ACTOR_JSON_SAVE_PATH, ACTOR_PICKLE_SAVE_PATH
 from foo.file_folder_deal import check_if_file_folder_exists
 
 
-def save_movie_to_json(data):
-    """将电影类集合保存到json中"""
-    check_if_file_folder_exists(JSON_SAVE_PATH)
-    movies = [i.__dict__ for i in data]
-    json_content = json.dumps(movies, ensure_ascii=False, indent=4)
-    with open(JSON_SAVE_PATH, 'w', encoding='utf-8') as f:
+def update_dict_info(aim_dict, key, value):
+    """处理值是list的字典"""
+    if key not in aim_dict.keys:
+        aim_dict[key] = [value]
+    else:
+        aim_dict[key].append(value)
+
+
+def save_movie_to_json(data, c):
+    """将数据集合保存到json中"""
+    if c == 'm':
+        path = MOVIE_JSON_SAVE_PATH
+    elif c == 'a':
+        path = ACTOR_JSON_SAVE_PATH
+    else:
+        raise Exception('咨询管理员解决...')
+
+    check_if_file_folder_exists(path)
+    data = [i.get_json() for i in data]
+
+    json_content = json.dumps(data, ensure_ascii=False, indent=4)
+    with open(path, 'w', encoding='utf-8') as f:
         f.write(json_content)
 
 
-def save_movie_to_pickle(data):
-    """将电影类集合持久化到本地"""
-    check_if_file_folder_exists(JSON_SAVE_PATH)
-    with open(MOVIES_SAVE_PATH, 'wb') as f:
+def save_data_to_pickle(data, c):
+    """将数据集合持久化到本地"""
+    if c == 'm':
+        path = MOVIE_PICKLE_SAVE_PATH
+    elif c == 'a':
+        path = ACTOR_PICKLE_SAVE_PATH
+    else:
+        raise Exception('咨询管理员解决...')
+
+    check_if_file_folder_exists(path)
+    with open(path, 'wb') as f:
         pickle.dump(data, f)

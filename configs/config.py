@@ -18,8 +18,10 @@ BASE_PATH = ['G:/编程脚本/Movies']
 # 视频格式限制
 AIM_SUFFIX = ['.mkv', '.wmv', '.mp4', '.avi']
 # 保存路径
-JSON_SAVE_PATH = os.path.join(base_dir, 'temp/catalogue.json')
-MOVIES_SAVE_PATH = os.path.join(base_dir, 'temp/movies.pickle')
+MOVIE_JSON_SAVE_PATH = os.path.join(base_dir, 'temp/movies.json')
+MOVIE_PICKLE_SAVE_PATH = os.path.join(base_dir, 'temp/movies.pickle')
+ACTOR_JSON_SAVE_PATH = os.path.join(base_dir, 'temp/actors.json')
+ACTOR_PICKLE_SAVE_PATH = os.path.join(base_dir, 'temp/actors.pickle')
 
 # logo路径
 ICO_PATH = os.path.join(base_dir, 'materials/自由之翼.ico')

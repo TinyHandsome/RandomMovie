@@ -23,3 +23,9 @@ class Movie:
     topic: str
     name: str
     path: str
+
+    def get_actor_name(self):
+        return self.name
+
+    def get_json(self):
+        return self.__dict__
