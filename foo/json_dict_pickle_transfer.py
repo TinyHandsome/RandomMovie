@@ -24,9 +24,7 @@ def save_movie_to_json(data, c):
         result = [i.get_json() for i in data]
     elif c == 'a':
         path = ACTOR_JSON_SAVE_PATH
-        result = {}
-        for k, v in data.items():
-            result[k] = v.get_json()
+        result = [i.get_json() for i in data.values()]
     else:
         raise Exception('咨询管理员解决...')
 

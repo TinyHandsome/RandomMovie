@@ -88,7 +88,7 @@ def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: st
 
 def update_actor_info(actor_infos: dict, actor_name, movie_data):
     """处理值是list的字典"""
-    current_actor_names = [a.get_actor_name() for a in actor_infos]
+    current_actor_names = actor_infos.keys()
 
     if actor_name not in current_actor_names:
         actor_infos[actor_name] = (Actor(actor_name, [movie_data]))
