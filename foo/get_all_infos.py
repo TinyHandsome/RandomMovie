@@ -66,8 +66,9 @@ def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: st
 
     # 演员名处理
     name = actor_name
-    if get_value_if_not_none_else_empty('name') != '':
-        name = actor_name
+    info_name = get_value_if_not_none_else_empty('name')
+    if info_name != '':
+        name = info_name
 
     movie = {
         'plate_number': get_value_if_not_none_else_empty('plate_number'),

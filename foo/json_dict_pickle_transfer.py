@@ -29,5 +29,5 @@ def save_movie_to_json(data):
 def save_movie_to_pickle(data):
     """将电影类集合持久化到本地"""
     check_if_file_folder_exists(JSON_SAVE_PATH)
-    with open(MOVIES_SAVE_PATH, 'w') as f:
+    with open(MOVIES_SAVE_PATH, 'wb') as f:
         pickle.dump(data, f)
