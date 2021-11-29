@@ -85,7 +85,7 @@ def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: st
     return movie
 
 
-def get_actor_movies(actor_infos: list, movie_data: Movie, folder_actors: list, folder_name_actor: str):
+def get_actor_movies(actor_infos: dict, movie_data: Movie, folder_actors: list, folder_name_actor: str):
     """根据演员文件夹的名称，获得对应的电影信息"""
     # 直接演员名写入
     if folder_name_actor != '':
@@ -104,7 +104,7 @@ def get_all_infos():
     # 文件夹演员名称列表
     folder_actors = []
     # 总文件夹演员数据
-    actor_infos = []
+    actor_infos = {}
 
     for path in BASE_PATH:
         seconds = os.listdir(path)

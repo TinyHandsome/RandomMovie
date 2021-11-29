@@ -17,7 +17,7 @@ from configs.config import MOVIE_JSON_SAVE_PATH, MOVIE_PICKLE_SAVE_PATH, ACTOR_J
 from foo.file_folder_deal import check_if_file_folder_exists
 
 
-def update_dict_info(aim_dict, key, value):
+def update_dict_info(aim_dict: dict, key, value):
     """处理值是list的字典"""
     if key not in aim_dict.keys:
         aim_dict[key] = [value]
