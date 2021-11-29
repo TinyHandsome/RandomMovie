@@ -65,18 +65,22 @@ def deal_long_name(long_name):
 def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: str):
     """将电影的信息转换为字典返回"""
 
-    code = result_dict.get('code').lower()
-    c = (result_dict.get('c') is not None) or ('ch' in code)
+    c = False
+    episode = ''
 
-    # 检查完ch之后，去掉code中的ch
-    code = code.replace('ch', '')
+    code = result_dict.get('code')
+    if code is not None:
+        code = code.lower()
+        c = 'ch' in code
+        # 检查完ch之后，去掉code中的ch
+        code = code.replace('ch', '')
 
-    if 'a' in code:
-        episode = 'a'
-    elif 'b' in code:
-        episode = 'b'
-    else:
-        episode = '' if code is None else code
+        # 再检查ab
+        if 'a' in code:
+            episode = 'a'
+        elif 'b' in code:
+            episode = 'b'
+    c = (result_dict.get('c') is not None) or c
 
     def get_value_if_not_none_else_empty(key):
         """获取字典中的值，如果位空的话则为空字符串"""
@@ -119,13 +123,13 @@ def get_all_infos():
             for movie in thirds:
                 third_path = os.path.join(second_path, movie)
                 # 如果是文件，且后缀满足要求
-                if is_file(movie) and is_aim_suffix(movie):
+                if is_file(third_path) and is_aim_suffix(movie):
                     long_name = get_remove_suffix(movie)
                     result_dict = deal_long_name(long_name)
 
                     # 如果没有成功匹配，就直接给个topic完事儿
                     if not result_dict:
-                        result_dict['topic'] = long_name
+                        result_dict = {'topic': long_name}
 
                     # 开始写入数据
                     sub_data = generate_single_movie_info_dict(result_dict, third_path, actor_name)
