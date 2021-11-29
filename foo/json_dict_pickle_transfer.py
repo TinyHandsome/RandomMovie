@@ -29,15 +29,18 @@ def save_movie_to_json(data, c):
     """将数据集合保存到json中"""
     if c == 'm':
         path = MOVIE_JSON_SAVE_PATH
+        result = [i.get_json() for i in data]
     elif c == 'a':
         path = ACTOR_JSON_SAVE_PATH
+        result = {}
+        for k, v in data.items():
+            result[k] = v.get_json()
     else:
         raise Exception('咨询管理员解决...')
 
     check_if_file_folder_exists(path)
-    data = [i.get_json() for i in data]
 
-    json_content = json.dumps(data, ensure_ascii=False, indent=4)
+    json_content = json.dumps(result, ensure_ascii=False, indent=4)
     with open(path, 'w', encoding='utf-8') as f:
         f.write(json_content)
 
