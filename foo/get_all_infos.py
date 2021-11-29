@@ -62,7 +62,7 @@ def deal_long_name(long_name):
     return params
 
 
-def generate_single_movie_info_dict(result_dict: dict, path: str):
+def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: str):
     """将电影的信息转换为字典返回"""
 
     code = result_dict.get('code').lower()
@@ -82,13 +82,18 @@ def generate_single_movie_info_dict(result_dict: dict, path: str):
         """获取字典中的值，如果位空的话则为空字符串"""
         return result_dict.get(key) if result_dict.get(key) is not None else ''
 
+    # 演员名处理
+    name = actor_name
+    if get_value_if_not_none_else_empty('name') != '':
+        name = actor_name
+
     sub_data = {
         'plate_num': get_value_if_not_none_else_empty('plate_num'),
         'episode': episode,
         'c': '中文字幕' if c else '',
         'u': '无码' if result_dict.get('u') is not None else '有码',
         'topic': get_value_if_not_none_else_empty('topic'),
-        'name': get_value_if_not_none_else_empty('topic'),
+        'name': name,
         'path': path
     }
 
@@ -103,7 +108,7 @@ def get_all_infos():
         seconds = os.listdir(path)
 
         for actor_name in seconds:
-            second_path = os.path.join(BASE_PATH, actor_name)
+            second_path = os.path.join(path, actor_name)
             # _开头的文件夹，无演员名
             if is_dir(second_path):
                 if actor_name.startswith('_'):
@@ -123,7 +128,7 @@ def get_all_infos():
                         result_dict['topic'] = long_name
 
                     # 开始写入数据
-                    sub_data = generate_single_movie_info_dict(result_dict)
+                    sub_data = generate_single_movie_info_dict(result_dict, third_path, actor_name)
                     data.append(sub_data)
 
     print(data)
