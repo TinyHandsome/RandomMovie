@@ -17,6 +17,8 @@ base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 BASE_PATH = ['G:/编程脚本/Movies']
 # 视频格式限制
 AIM_SUFFIX = ['.mkv', '.wmv', '.mp4', '.avi']
+# 保存路径
+JSON_SAVE_PATH = os.path.join(base_dir, 'temp/catalogue.json')
 
 # logo路径
 ICO_PATH = os.path.join(base_dir, 'materials/自由之翼.ico')

@@ -10,34 +10,11 @@
 @time: 2021/11/29 9:57
 @desc: 获取所有文件的信息
 """
-import os
 import re
 
-from configs.config import BASE_PATH, AIM_SUFFIX
-
-
-def is_dir(path):
-    """检查路径是否是文件夹"""
-    return os.path.isdir(path)
-
-
-def is_file(path):
-    """检查路径是否是文件"""
-    return os.path.isfile(path)
-
-
-def is_aim_suffix(file):
-    """检查文件的后缀名是否是目标后缀"""
-    suffix = os.path.splitext(file)[1]
-    if suffix in AIM_SUFFIX:
-        return True
-    else:
-        return False
-
-
-def get_remove_suffix(file):
-    """获取文件非后缀"""
-    return os.path.splitext(file)[0]
+from configs.config import BASE_PATH
+from foo.file_folder_deal import *
+from foo.json_dict_transfer import save_dict_to_json
 
 
 def deal_long_name(long_name):
@@ -92,7 +69,7 @@ def generate_single_movie_info_dict(result_dict: dict, path: str, actor_name: st
         name = actor_name
 
     sub_data = {
-        'plate_num': get_value_if_not_none_else_empty('plate_num'),
+        'plate_number': get_value_if_not_none_else_empty('plate_number'),
         'episode': episode,
         'c': '中文字幕' if c else '',
         'u': '无码' if result_dict.get('u') is not None else '有码',
@@ -135,7 +112,7 @@ def get_all_infos():
                     sub_data = generate_single_movie_info_dict(result_dict, third_path, actor_name)
                     data.append(sub_data)
 
-    print(data)
+    save_dict_to_json(data)
 
 
 if __name__ == '__main__':
