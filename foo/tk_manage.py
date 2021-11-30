@@ -42,7 +42,7 @@ class TkManage:
         self.cb_top = tk.BooleanVar()
 
         # 资源导入
-        self.movies, self.actors = self.mtm.create_thread_and_run(self.load_resources)
+        self.movies, self.actors = self.mtm.create_thread_and_run(self.load_resources, need_return=True)
 
         # 快捷键注册
         self.register_hk()

@@ -39,9 +39,10 @@ class MyThreadManage:
     def __init__(self):
         self.total_threads = []
 
-    def create_thread_and_run(self, target, args=(), daemon=False):
+    def create_thread_and_run(self, target, args=(), daemon=False, need_return=False):
         t = MyThread(target=target, args=args, daemon=daemon)
         # 不需要守护线程，也不需要join等待运行完了才执行主线程
         self.total_threads.append(t)
         t.start()
-        return t.get_result()
+        if need_return:
+            return t.get_result()
