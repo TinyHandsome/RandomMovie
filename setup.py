@@ -31,24 +31,31 @@ font_label = ("microsoft yahei", 14)
 # 菜单栏
 menubar = tk.Menu(root)
 # 创建文件菜单
-filemenu = tk.Menu(menubar, tearoff=0)
+filemenu = tk.Menu(menubar, tearoff=False)
 menubar.add_cascade(label='文件', menu=filemenu)
-filemenu.add_checkbutton(label='置顶(t)', variable=tkm.cb_top, onvalue=True,
-                         # font=font_button,
-                         offvalue=False, command=tkm.set_top)
+filemenu.add_checkbutton(label='置顶', variable=tkm.cb_top, onvalue=True,
+                         # font=font_button, , selectcolor='red',
+                         offvalue=False, command=tkm.set_top, accelerator='Alt+T')
 filemenu.add_separator()
-filemenu.add_command(label='退出(w)', command=tkm.quit)
+filemenu.add_command(label='退出', command=tkm.quit, accelerator='Alt+W')
+# 创建编辑菜单
+editmenu = tk.Menu(menubar, tearoff=False)
+menubar.add_cascade(label='编辑', menu=editmenu)
+# 创建播放菜单
+last_one = tk.Menu(menubar, tearoff=False)
+menubar.add_cascade(label='⏮', menu=last_one, command=...)
+play = tk.Menu(menubar, tearoff=False)
+menubar.add_cascade(label='▶', menu=play, command=...)
+next_one = tk.Menu(menubar, tearoff=False)
+menubar.add_cascade(label='⏭', menu=next_one, command=...)
+random_one = tk.Menu(menubar, tearoff=False)
+menubar.add_cascade(label='🔀', menu=random_one, command=...)
 
 f1 = tk.Frame(root)
-f2 = tk.Frame(root)
-f3 = tk.Frame(root)
+f_left = tk.Frame(root)
+f_right = tk.Frame(root)
 f4 = tk.Frame(root)
 
-r1 = tk.Checkbutton(f1, text='置顶(t)', font=font_button, variable=tkm.cb_top, onvalue=True, offvalue=False,
-                    command=tkm.set_top)
-r1.deselect()
-tkm.set_top()
-r1.pack()
 
 f1.pack()
 

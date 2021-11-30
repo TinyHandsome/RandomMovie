@@ -57,5 +57,5 @@ def load_pickle(c):
         path = ACTOR_PICKLE_SAVE_PATH
     else:
         raise Exception('咨询管理员解决...')
-
-    return pickle.load(path)
+    with open(path, 'rb') as f:
+        return pickle.load(f)

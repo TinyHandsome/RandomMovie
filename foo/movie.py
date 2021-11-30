@@ -29,3 +29,9 @@ class Movie:
 
     def get_json(self):
         return self.__dict__
+
+    def get_path(self):
+        return self.path
+
+    def get_movie_info(self):
+        return self.plate_number + self.episode + ': ' + self.name
