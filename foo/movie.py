@@ -34,4 +34,4 @@ class Movie:
         return self.path
 
     def get_movie_info(self):
-        return self.plate_number + self.episode + ': ' + self.name
+        return self.plate_number + self.episode + ': ' + self.topic + '（' + self.name + '）'

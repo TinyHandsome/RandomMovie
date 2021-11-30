@@ -10,6 +10,7 @@
 @time: 2021/11/30 9:33
 @desc: 管理tk的一些函数和计数
 """
+import datetime
 import os
 
 from system_hotkey import SystemHotkey
@@ -18,6 +19,10 @@ from foo.json_dict_pickle_transfer import load_pickle
 from foo.get_all_infos import get_all_infos
 from foo.mythreads import MyThreadManage
 from random import sample
+
+
+def get_current_time():
+    return datetime.datetime.now().strftime('%Y%m%d %H:%M:%S')
 
 
 class TkManage:
@@ -40,6 +45,12 @@ class TkManage:
 
         # 是否置顶的标签
         self.cb_top = tk.BooleanVar()
+        # 各中信息的值
+        self.l_info = tk.StringVar()
+        # 电影下拉菜单选项
+        self.l_list_choose = tk.StringVar()
+        # 演员名称
+        self.actors = tk.StringVar()
 
         # 资源导入
         self.movies, self.actors = self.mtm.create_thread_and_run(self.load_resources, need_return=True)
@@ -47,20 +58,36 @@ class TkManage:
         # 快捷键注册
         self.register_hk()
 
+    def print_info(self, info):
+        current_time = get_current_time()
+        result_info = '[' + current_time + ']' + info
+        self.mtm.create_thread_and_run(lambda: self.l_info.set(result_info))
+
     def load_resources(self):
-        print('【初始化】更新资源中...')
+        """
+        1. 导入资源
+        2. 更新演员名称
+        :return:
+        """
+        self.print_info('【初始化】更新资源中...')
         try:
             get_all_infos()
-            return load_pickle('m'), load_pickle('a')
+            movies, actors = load_pickle('m'), load_pickle('a')
+
+            # 更新演员列表
+            actor_names = [a.get_actor_name() for a in actors]
+            self.actors.set(' '.join(actor_names))
+
+            return movies, actors
         except:
-            print('【初始化】你没有资源或者路径配置错误...')
+            self.print_info('【初始化】你没有资源或者路径配置错误...')
             self.flag = False
             return None, None
 
     def flag_check(self):
         """检查是否读取到有效的资源"""
         if not self.flag:
-            print('【初始化】你没有资源或者路径配置错误...')
+            self.print_info('【初始化】你没有资源或者路径配置错误...')
             return False
         else:
             return True
@@ -71,10 +98,10 @@ class TkManage:
         self.cb_top.set(current_top_situation)
         if current_top_situation:
             self.root.wm_attributes('-topmost', 1)
-            print('【置顶】设置界面置顶...')
+            self.print_info('【置顶】设置界面置顶...')
         else:
             self.root.wm_attributes('-topmost', 0)
-            print('【置顶】取消界面置顶...')
+            self.print_info('【置顶】取消界面置顶...')
         self.root.focus_force()
 
     def quit(self):
@@ -91,7 +118,7 @@ class TkManage:
 
         self.indicator += 1
         self.current_movie = self.movies[self.indicator]
-        print('【下一个】' + self.current_movie.get_movie_info())
+        self.print_info('【下一个】' + self.current_movie.get_movie_info())
 
     def get_last_movie(self):
         """获取上一个历史电影，无法回头"""
@@ -100,21 +127,22 @@ class TkManage:
 
         if len(self.play_list) > 0:
             self.current_movie = self.play_list.pop()
-            print('【上一个】' + self.current_movie.get_movie_info())
+            self.print_info('【上一个】' + self.current_movie.get_movie_info())
         else:
-            print('【上一个】没有上一个电影...')
+            self.print_info('【上一个】没有上一个电影...')
 
     def play_movie(self):
         """播放当前电影"""
         if not self.flag_check():
             return 'error: invalid resource'
 
+        self.print_info('【播放】' + self.current_movie.get_movie_info())
+
         def temp_f():
             try:
                 os.system(self.current_movie.get_path())
-                print('【播放】' + self.current_movie.get_movie_info())
             except:
-                print('【播放】播放路径错误...')
+                self.print_info('【播放】播放路径错误...')
 
         self.mtm.create_thread_and_run(target=temp_f)
 
@@ -127,6 +155,11 @@ class TkManage:
             self.play_list.append(self.current_movie)
         self.current_movie = sample(self.movies, 1)[0]
         self.play_movie()
+
+    def open_readme(self):
+        """打开readme"""
+        self.print_info('【点击】正在打开README...')
+        os.startfile('README.md')
 
     def register_hk(self):
         """注册快捷键绑定"""
