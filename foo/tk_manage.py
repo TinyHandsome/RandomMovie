@@ -29,6 +29,8 @@ class TkManage:
         self.mtm = MyThreadManage()
 
         # 【信息变量】
+        # 是否读取的到数据
+        self.flag = True
         # 当前播放
         self.current_movie = None
         # 顺序播放指针
@@ -52,9 +54,19 @@ class TkManage:
             return load_pickle('m'), load_pickle('a')
         except:
             print('【初始化】你没有资源或者路径配置错误...')
+            self.flag = False
             return None, None
 
+    def flag_check(self):
+        """检查是否读取到有效的资源"""
+        if not self.flag:
+            print('【初始化】你没有资源或者路径配置错误...')
+            return False
+        else:
+            return True
+
     def set_top(self):
+        """设置置顶"""
         current_top_situation = not self.cb_top.get()
         self.cb_top.set(current_top_situation)
         if current_top_situation:
@@ -66,10 +78,14 @@ class TkManage:
         self.root.focus_force()
 
     def quit(self):
+        """退出"""
         self.root.destroy()
 
     def get_next_movie(self):
         """获取下一个电影"""
+        if not self.flag_check():
+            return 'error: invalid resource'
+
         if self.indicator >= 0:
             self.play_list.append(self.current_movie)
 
@@ -79,6 +95,9 @@ class TkManage:
 
     def get_last_movie(self):
         """获取上一个历史电影，无法回头"""
+        if not self.flag_check():
+            return 'error: invalid resource'
+
         if len(self.play_list) > 0:
             self.current_movie = self.play_list.pop()
             print('【上一个】' + self.current_movie.get_movie_info())
@@ -87,6 +106,8 @@ class TkManage:
 
     def play_movie(self):
         """播放当前电影"""
+        if not self.flag_check():
+            return 'error: invalid resource'
 
         def temp_f():
             try:
@@ -99,6 +120,9 @@ class TkManage:
 
     def play_random_movie(self):
         """播放随机电影"""
+        if not self.flag_check():
+            return 'error: invalid resource'
+
         if self.current_movie is not None:
             self.play_list.append(self.current_movie)
         self.current_movie = sample(self.movies, 1)[0]
