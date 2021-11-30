@@ -47,3 +47,15 @@ def save_data_to_pickle(data, c):
     check_if_file_folder_exists(path)
     with open(path, 'wb') as f:
         pickle.dump(data, f)
+
+
+def load_pickle(c):
+    """导入数据"""
+    if c == 'm':
+        path = MOVIE_PICKLE_SAVE_PATH
+    elif c == 'a':
+        path = ACTOR_PICKLE_SAVE_PATH
+    else:
+        raise Exception('咨询管理员解决...')
+
+    return pickle.load(path)
