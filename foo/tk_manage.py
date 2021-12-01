@@ -34,6 +34,8 @@ class TkManage:
         self.mtm = MyThreadManage()
 
         # 【信息变量】
+        # 是否记录日志
+        self.is_log = True
         # 是否读取的到数据
         self.flag = True
         # 当前播放
@@ -103,7 +105,9 @@ class TkManage:
             self.actors.set(' '.join(actor_names))
 
             return movies, actors
-        except:
+        except Exception as e:
+            if self.is_log:
+                print(repr(e))
             self.print_info('【初始化】你没有资源或者路径配置错误...')
             self.flag = False
             return None, None
