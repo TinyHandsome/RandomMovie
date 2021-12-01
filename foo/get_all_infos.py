@@ -163,4 +163,4 @@ def get_all_infos():
 
 
 if __name__ == '__main__':
-    print(deal_long_name('fcdss-007-2【FALENO初BEST8時間超誘発撮りで魅せるリアルSEX】'))
+    ...
