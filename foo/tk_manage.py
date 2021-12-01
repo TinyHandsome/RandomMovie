@@ -111,7 +111,7 @@ class TkManage:
     def flag_check(self):
         """检查是否读取到有效的资源"""
         if not self.flag:
-            self.print_info('【初始化】你没有资源或者路径配置错误...')
+            self.print_info('【播放前检查】你没有资源或者路径配置错误...')
             return False
         else:
             return True
