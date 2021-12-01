@@ -12,12 +12,14 @@
 """
 import datetime
 import os
+import traceback
 
 from system_hotkey import SystemHotkey
 import tkinter as tk
 from foo.json_dict_pickle_transfer import load_pickle
 from foo.get_all_infos import get_all_infos
 from foo.mythreads import MyThreadManage
+from configs.config import TEST_MODE
 from random import sample
 
 
@@ -74,6 +76,7 @@ class TkManage:
         2. 运行函数
         3. 更新tk信息
         """
+
         def wrapper(*args, **kwargs):
             if not self.flag_check():
                 return 'error: invalid resource'
@@ -95,19 +98,24 @@ class TkManage:
         2. 更新演员名称
         :return:
         """
-        self.print_info('【初始化】更新资源中...')
         try:
-            get_all_infos()
+            # 用测试来控制，是否更新本地数据
+            if not TEST_MODE:
+                get_all_infos()
+                self.print_info('【初始化】更新资源中...')
+            else:
+                self.print_info('【初始化】获取本地资源中...')
             movies, actors = load_pickle('m'), load_pickle('a')
 
             # 更新演员列表
-            actor_names = [a.get_actor_name() for a in actors]
+            actor_names = actors.keys()
             self.actors.set(' '.join(actor_names))
+            self.print_info('【初始化】获取资源完毕...')
 
             return movies, actors
         except Exception as e:
             if self.is_log:
-                print(repr(e))
+                traceback.print_exc()
             self.print_info('【初始化】你没有资源或者路径配置错误...')
             self.flag = False
             return None, None

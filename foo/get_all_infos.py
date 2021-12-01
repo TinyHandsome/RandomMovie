@@ -22,7 +22,7 @@ from foo.movie import Movie
 def deal_long_name(long_name):
     """对文件名进行正则表达式的拆解"""
     # 【情况1】有车牌
-    pattern1 = re.compile(r'(?P<plate_number>[\d\w]+-[\d]+)(?P<code>\w+)?(?P<c>-C)?'
+    pattern1 = re.compile(r'(?P<plate_number>[\d\w]+-[\d]+)(?P<code>[\w\d-]+)?(?P<c>-C)?'
                           '(?P<u>-uncensored)?(【(?P<topic>.*?)】)?(（(?P<name>.*?)）)?', re.I)
     result = pattern1.match(long_name)
     # 【情况2】无车牌，但有topic
@@ -163,4 +163,4 @@ def get_all_infos():
 
 
 if __name__ == '__main__':
-    get_all_infos()
+    print(deal_long_name('fcdss-007-2【FALENO初BEST8時間超誘発撮りで魅せるリアルSEX】'))
