@@ -64,16 +64,16 @@ f_main = tk.Frame(root)
 # -- 左侧栏
 f_main_left = tk.Frame(f_main)
 # 车牌号
-l_plate_number = tk.Label(f_main_left, text='asdf', width=10)
+l_plate_number = tk.Label(f_main_left, textvariable=tkm.plate_num, width=10)
 l_plate_number.grid(row=0, column=0)
 # 演员名称
-l_actor_name = tk.Label(f_main_left, text='asdfasdfasdf')
+l_actor_name = tk.Label(f_main_left, textvariable=tkm.actor_name)
 l_actor_name.grid(row=0, column=1)
 # 其他信息
-l_other_info = tk.Label(f_main_left, text='asdf', width=10)
+l_other_info = tk.Label(f_main_left, textvariable=tkm.other_info, width=10)
 l_other_info.grid(row=0, column=2)
 # 电影名称
-l_movie_name = tk.Label(f_main_left, text='asdf')
+l_movie_name = tk.Label(f_main_left, textvariable=tkm.movie_name)
 l_movie_name.grid(row=1, column=0, columnspan=3)
 # 右侧选框演员对应的所有电影
 temp_list = (1, 2, 3)

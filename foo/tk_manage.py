@@ -45,18 +45,42 @@ class TkManage:
 
         # 是否置顶的标签
         self.cb_top = tk.BooleanVar()
-        # 各中信息的值
+        # 各种信息的值
         self.l_info = tk.StringVar()
         # 电影下拉菜单选项
         self.l_list_choose = tk.StringVar()
-        # 演员名称
+        # 所有演员名称
         self.actors = tk.StringVar()
+        # 车牌+特殊编号
+        self.plate_num = tk.StringVar()
+        # 电影名称
+        self.movie_name = tk.StringVar()
+        # 演员名称
+        self.actor_name = tk.StringVar()
+        # 其他信息
+        self.other_info = tk.StringVar()
 
         # 资源导入
-        self.movies, self.actors = self.mtm.create_thread_and_run(self.load_resources, need_return=True)
+        self.movies, self.actors = self.load_resources()
 
         # 快捷键注册
         self.register_hk()
+
+    def decorate_run_movie(self, my_func):
+        """获取电影前装饰器和后装饰器
+        1. 检查是否有资源
+        2. 运行函数
+        3. 更新tk信息
+        """
+        def wrapper(*args, **kwargs):
+            if not self.flag_check():
+                return 'error: invalid resource'
+
+            my_func()
+
+            self.get_current_movie_info()
+
+        return wrapper
 
     def print_info(self, info):
         current_time = get_current_time()
@@ -108,6 +132,13 @@ class TkManage:
         """退出"""
         self.root.destroy()
 
+    def get_current_movie_info(self):
+        """获取当前电影的信息，并传给tk"""
+        self.plate_num.set(self.current_movie.get_movie_plate_num())
+        self.actor_name.set(self.current_movie.get_movie_actor_name())
+        self.movie_name.set(self.current_movie.get_movie_name())
+        self.other_info.set(self.current_movie.get_movie_other_info())
+
     def get_next_movie(self):
         """获取下一个电影"""
         if not self.flag_check():
@@ -118,6 +149,8 @@ class TkManage:
 
         self.indicator += 1
         self.current_movie = self.movies[self.indicator]
+        # 填入信息到tk中
+        self.get_current_movie_info()
         self.print_info('【下一个】' + self.current_movie.get_movie_info())
 
     def get_last_movie(self):
@@ -127,6 +160,8 @@ class TkManage:
 
         if len(self.play_list) > 0:
             self.current_movie = self.play_list.pop()
+            # 填入信息到tk中
+            self.get_current_movie_info()
             self.print_info('【上一个】' + self.current_movie.get_movie_info())
         else:
             self.print_info('【上一个】没有上一个电影...')
@@ -154,6 +189,8 @@ class TkManage:
         if self.current_movie is not None:
             self.play_list.append(self.current_movie)
         self.current_movie = sample(self.movies, 1)[0]
+        # 填入信息到tk中
+        self.get_current_movie_info()
         self.play_movie()
 
     def open_readme(self):

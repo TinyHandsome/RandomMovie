@@ -35,3 +35,15 @@ class Movie:
 
     def get_movie_info(self):
         return self.plate_number + self.episode + ': ' + self.topic + '（' + self.name + '）'
+
+    def get_movie_plate_num(self):
+        return self.plate_number + self.episode
+
+    def get_movie_actor_name(self):
+        return self.name
+
+    def get_movie_name(self):
+        return self.topic
+
+    def get_movie_other_info(self):
+        return ' '.join([self.c, self.u])
