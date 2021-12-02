@@ -22,7 +22,7 @@ import tkinter as tk
 from foo.json_dict_pickle_transfer import load_pickle
 from foo.get_all_infos import get_all_infos
 from foo.mythreads import MyThreadManage
-from configs.config import TEST_MODE
+from configs.config import TEST_MODE, CLICK_ACTOR_PLAY_FIRST_MOVIE_RIGHT_NOW, CLICK_MOVIE_PLAY_RIGHT_NOW
 from random import randint
 
 
@@ -263,7 +263,7 @@ class TkManage:
         if self.current_movie and self.indicator >= 0:
             self.play_list.append(self.indicator)
 
-        self.indicator = randint(0, len(self.movie_set))
+        self.indicator = randint(0, len(self.movie_set) - 1)
         self.update_movie_curse()
         self.current_movie = self.movie_set[self.indicator]
         # 填入信息到tk中
@@ -309,8 +309,9 @@ class TkManage:
             self.print_info('【点击】选择演员：' + select_name)
             # 更新movie set为该演员下的movie
             self.update_movie_set(actor.get_movies())
-            # 获取第一个movie
-            self.get_next_movie()
+            # 【暂时不获取】获取第一个movie
+            if CLICK_ACTOR_PLAY_FIRST_MOVIE_RIGHT_NOW:
+                self.get_next_movie()
 
         self.mtm.create_thread_and_run(ca)
 
@@ -322,7 +323,8 @@ class TkManage:
             select_name, self.current_movie = get_listbox_curselection(self.movies_lb, self.movie_set)
             self.update_tk_current_movie_info()
             self.print_info('【点击】选择电影：' + select_name)
-            self.play_movie()
+            if CLICK_MOVIE_PLAY_RIGHT_NOW:
+                self.play_movie()
 
         self.mtm.create_thread_and_run(cm)
 

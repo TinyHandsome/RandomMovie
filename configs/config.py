@@ -15,6 +15,10 @@ base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 # 是否开启测试模式
 TEST_MODE = True
+# 点击演员后是否立刻获取该演员的第一个movie
+CLICK_ACTOR_PLAY_FIRST_MOVIE_RIGHT_NOW = False
+# 点击电影信息后是否立刻播放
+CLICK_MOVIE_PLAY_RIGHT_NOW = False
 
 # 视频根目录
 BASE_PATH = ['G:/编程脚本/Movies']
