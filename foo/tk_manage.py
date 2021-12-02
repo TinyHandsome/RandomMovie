@@ -13,6 +13,7 @@
 """
 import datetime
 import os
+import time
 import traceback
 import copy
 
@@ -22,7 +23,7 @@ from foo.json_dict_pickle_transfer import load_pickle
 from foo.get_all_infos import get_all_infos
 from foo.mythreads import MyThreadManage
 from configs.config import TEST_MODE
-from random import sample
+from random import randint
 
 
 def get_current_time():
@@ -35,6 +36,21 @@ def label_limit_length_check(tk_var: tk.StringVar, limit: int, label: tk.Label):
         label.configure(anchor='w')
     else:
         label.configure(anchor='center')
+
+
+def get_listbox_curselection(lb, lb_set):
+    """获取listbox的选项，以及在数组中的值"""
+    select_index = lb.curselection()[0]
+    # 演员名称
+    select_name = lb.get(select_index)
+    if isinstance(lb_set, dict):
+        result = lb_set.get(select_name)
+    elif isinstance(lb_set, list):
+        result = lb_set[select_index]
+    else:
+        result = None
+
+    return select_name, result
 
 
 class TkManage:
@@ -52,17 +68,17 @@ class TkManage:
         self.flag = True
         # 当前播放
         self.current_movie = None
+        # 历史指针
+        self.indicator_history = -1
         # 顺序播放指针
         self.indicator = -1
-        # 播放历史
+        # 播放指针历史
         self.play_list = []
 
         # 是否置顶的标签
         self.cb_top = tk.BooleanVar()
         # 各种信息的值
         self.l_info = tk.StringVar()
-        # 所有演员名称
-        self.actor_names = tk.StringVar()
         # 车牌+特殊编号
         self.plate_num = tk.StringVar()
         # 电影名称
@@ -71,17 +87,22 @@ class TkManage:
         self.actor_name = tk.StringVar()
         # 其他信息
         self.other_info = tk.StringVar()
-        # listbox变量
+        # 演员listbox变量
         self.actor_lb = None
+        # 所有演员名称
+        self.actor_names = tk.StringVar()
+        # 电影listbox变量
+        self.movies_lb = None
+        # 所有电影名称
+        self.movie_names = tk.StringVar()
 
         # 初始化界面
         self.init_tk()
         # 资源导入
         self.movies, self.actors = self.load_resources()
         # 设置电影从这个电影集中抽取
-        self.movie_set = copy.deepcopy(self.movies)
-        # 获取所有电影的详细信息
-        self.movie_set_infos = self.get_movie_set_infos()
+        self.movie_set = None
+        self.update_movie_set(copy.deepcopy(self.movies))
 
         # 快捷键注册
         self.register_hk()
@@ -100,7 +121,7 @@ class TkManage:
 
             my_func()
 
-            self.get_current_movie_info()
+            self.update_tk_current_movie_info()
 
         return wrapper
 
@@ -111,7 +132,7 @@ class TkManage:
         self.mtm.create_thread_and_run(lambda: self.l_info.set(result_info))
 
     def load_resources(self):
-        """
+        """ 初始化资源的过程
         1. 导入资源
         2. 更新演员名称
         :return:
@@ -128,6 +149,10 @@ class TkManage:
             # 更新演员列表
             actor_names = actors.keys()
             self.actor_names.set(' '.join(actor_names))
+            # 更新电影列表
+            movie_infos = [m.get_movie_info() for m in movies]
+            self.movie_names.set(' '.join(movie_infos))
+
             self.print_info('【初始化】获取资源完毕...')
 
             return movies, actors
@@ -169,7 +194,7 @@ class TkManage:
         self.movie_name.set('电影名')
         self.other_info.set('其他')
 
-    def get_current_movie_info(self):
+    def update_tk_current_movie_info(self):
         """获取当前电影的信息，并传给tk"""
         self.plate_num.set(self.current_movie.get_movie_plate_num())
         self.actor_name.set(self.current_movie.get_movie_actor_name())
@@ -181,8 +206,8 @@ class TkManage:
         if not self.flag_check():
             return 'error: invalid resource'
 
-        if self.current_movie:
-            self.play_list.append(self.current_movie)
+        if self.current_movie and self.indicator >= 0:
+            self.play_list.append(self.indicator)
 
         self.indicator += 1
         if self.indicator < len(self.movie_set):
@@ -191,9 +216,10 @@ class TkManage:
             self.print_info('【下一个】没有下一个啦，从头循环哦...')
             self.indicator = 0
 
+        self.update_movie_curse()
         self.current_movie = self.movie_set[self.indicator]
         # 填入信息到tk中
-        self.get_current_movie_info()
+        self.update_tk_current_movie_info()
         self.print_info('【下一个】' + self.current_movie.get_movie_info())
 
     def get_last_movie(self):
@@ -202,9 +228,11 @@ class TkManage:
             return 'error: invalid resource'
 
         if len(self.play_list) > 0:
-            self.current_movie = self.play_list.pop()
+            self.indicator = self.play_list.pop()
+            self.update_movie_curse()
+            self.current_movie = self.movie_set[self.indicator]
             # 填入信息到tk中
-            self.get_current_movie_info()
+            self.update_tk_current_movie_info()
             self.print_info('【上一个】' + self.current_movie.get_movie_info())
         else:
             self.print_info('【上一个】没有上一个电影...')
@@ -227,16 +255,19 @@ class TkManage:
 
         self.mtm.create_thread_and_run(target=temp_f)
 
-    def play_random_movie(self):
+    def random_movie(self):
         """播放随机电影"""
         if not self.flag_check():
             return 'error: invalid resource'
 
-        if self.current_movie is not None:
-            self.play_list.append(self.current_movie)
-        self.current_movie = sample(self.movie_set, 1)[0]
+        if self.current_movie and self.indicator >= 0:
+            self.play_list.append(self.indicator)
+
+        self.indicator = randint(0, len(self.movie_set))
+        self.update_movie_curse()
+        self.current_movie = self.movie_set[self.indicator]
         # 填入信息到tk中
-        self.get_current_movie_info()
+        self.update_tk_current_movie_info()
         self.print_info('【随机】' + self.current_movie.get_movie_info())
 
     def open_readme(self):
@@ -250,21 +281,31 @@ class TkManage:
         # 重置指针
         self.indicator = -1
         # 更新movie set info
-        self.movie_set_infos = self.get_movie_set_infos()
+        movie_set_infos = self.get_movie_set_infos()
+        self.movie_names.set(' '.join(movie_set_infos))
+
+    def update_movie_curse(self):
+        """更新电影指针的位置，选择演员之后，历史记录清零，注意：指针的历史记录不应该<0"""
+        # 先清空之前的选择
+        self.movies_lb.selection_clear(self.indicator_history)
+        # 进行当前的选择
+        self.movies_lb.see(self.indicator)
+        self.movies_lb.selection_set(self.indicator)
+        # 保存当前的选择为历史选择
+        self.indicator_history = self.indicator
 
     def get_movie_set_infos(self):
         """获取所有电影的信息"""
         return [m.get_movie_info() for m in self.movie_set]
 
     def choose_actor(self):
-        """点击选择演员"""
+        """点击选择演员，并历史记录清零"""
 
         def ca():
+            # 清空历史记录
+            self.play_list = []
             # 演员编号
-            select_index = self.actor_lb.curselection()
-            # 演员名称
-            select_name = self.actor_lb.get(select_index)
-            actor = self.actors.get(select_name)
+            select_name, actor = get_listbox_curselection(self.actor_lb, self.actors)
             self.print_info('【点击】选择演员：' + select_name)
             # 更新movie set为该演员下的movie
             self.update_movie_set(actor.get_movies())
@@ -273,12 +314,24 @@ class TkManage:
 
         self.mtm.create_thread_and_run(ca)
 
+    def choose_movie(self):
+        """点击选择电影"""
+
+        def cm():
+            # 电影编号
+            select_name, self.current_movie = get_listbox_curselection(self.movies_lb, self.movie_set)
+            self.update_tk_current_movie_info()
+            self.print_info('【点击】选择电影：' + select_name)
+            self.play_movie()
+
+        self.mtm.create_thread_and_run(cm)
+
     def register_hk(self):
         """注册快捷键绑定"""
         sh = SystemHotkey()
         sh.register(('alt', 't'), callback=lambda e: self.set_top())
         sh.register(('alt', 'w'), callback=lambda e: self.quit())
-        sh.register(('alt', 'r'), callback=lambda e: self.play_random_movie())
+        sh.register(('alt', 'r'), callback=lambda e: self.random_movie())
         sh.register(('alt', 'e'), callback=lambda e: self.get_next_movie())
         sh.register(('alt', 'q'), callback=lambda e: self.get_last_movie())
         sh.register(('alt', 'space'), callback=lambda e: self.play_movie())

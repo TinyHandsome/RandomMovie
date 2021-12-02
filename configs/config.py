@@ -29,7 +29,7 @@ ACTOR_PICKLE_SAVE_PATH = os.path.join(base_dir, 'temp/actors.pickle')
 # logo路径
 ICO_PATH = os.path.join(base_dir, 'materials/自由之翼.ico')
 # 窗口位置
-ROOT_GEOMETRY = '+900+300'
+ROOT_GEOMETRY = '+900+500'
 # 主体和脚注大小限制
 WIDTH_F_MAIN, WIDTH_F_FOOT = None, None
 # 左侧栏一些label的宽度设置
